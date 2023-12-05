@@ -9,8 +9,8 @@ router = express.Router(),
 } = require('../controllers/User.controller')
 const auth = require ('../middlewares/auth')
 
-router.post('/signup', signUp)
-router.post('/login', login)
+router.post('/', auth, signUp)
+router.post('/',auth, login)
 router.get('/', auth, getUser)
 router.put('/', auth, updateUser)
 router.delete('/', auth, deleteUser)

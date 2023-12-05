@@ -1,20 +1,28 @@
-require('dotenv').config()
-const jwt = require('express-jwt')
-const secret = process.env.SECRET_JWT
-
-const getToken = (req) => {
-    let { authorization } = req.headers;
-    if(authorization) {
-        let [ type, token ] = authorization.split(' ')
-        return (type === 'Token' || type === 'Bearer') ? token : null
+const jwt = require('jsonwebtoken')
+ 
+module.exports = (req, res, next) => {
+ 
+    const token = req.header('x-auth-token')
+ 
+    if(!token) {
+        return res.status(401).json({
+            msg: "No hay token, permiso no válido"
+        })
     }
+ 
+    try {
+        const openToken = jwt.verify(token, process.env.SECRET_JWT)    
+ 
+        req.user = openToken.user
+ 
+        next()
+ 
+ 
+    } catch (error) {
+        res.json({
+            msg: "Hubo un error",
+            error
+        })
+    }
+ 
 }
-
-const auth = jwt.expressjwt({
-    secret,
-    algorithms: ['HS256'],
-    userProperty: 'user',
-    getToken
-})
-
-module.exports = auth;
